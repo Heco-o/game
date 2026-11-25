@@ -3,25 +3,38 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mazegame"
-    compileSdk = 35
+    namespace = "com.example.maze"
+    compileSdk = 36
+    buildToolsVersion = "36.0.0"
+    ndkVersion = "30.0.16248370"
 
     defaultConfig {
-        applicationId = "com.example.mazegame"
-        minSdk = 23
-        targetSdk = 35
+        applicationId = "com.example.maze"
+
+        // Android 9 (Pie) is API 28.
+        minSdk = 28
+
+        // Latest stable Android platform as of 2026-11-25.
+        targetSdk = 36
+
         versionCode = 1
         versionName = "1.0"
 
         ndk {
-            abiFilters += "arm64-v8a"
+            abiFilters += listOf("arm64-v8a")
         }
 
         externalNativeBuild {
             cmake {
                 cppFlags += listOf("-std=c++20")
-                arguments += listOf("-DANDROID_STL=c++_shared")
             }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "4.1.2"
         }
     }
 
@@ -32,13 +45,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
-    }
-
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.31.5"
         }
     }
 }
