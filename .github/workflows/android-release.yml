@@ -1,3 +1,4 @@
+
 name: Android Release APK
 
 on:
@@ -27,17 +28,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          packages: platform-tools
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
+            cmake;3.31.5
+            ndk;27.2.12479018
           log-accepted-android-sdk-licenses: false
-
-      - name: Install Android SDK packages
-        run: |
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "cmake;3.28.0" \
-            "ndk;27.2.12479018"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
