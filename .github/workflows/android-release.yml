@@ -1,48 +1,66 @@
 name: Android Release APK
 
 on:
-  push:
-    branches: [ "main", "master" ]
-  pull_request:
-  workflow_dispatch:
+	push:
+		branches: [ "main", "master" ]
+	pull_request:
+	workflow_dispatch:
 
 permissions:
-  contents: read
+	contents: read
 
 jobs:
-  build:
-    name: Build arm64-v8a release APK
-    runs-on: ubuntu-24.04
+	build:
+		name: Build arm64-v8a release APK
+		runs-on: ubuntu-24.04
 
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
+		steps:
+			- name: Checkout source
+				uses: actions/checkout@v7
 
-      - name: Set up Java
-        uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: "25"
+			- name: Set up Java
+				uses: actions/setup-java@v6
+				with:
+					distribution: temurin
+					java-version: "25"
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          # This action expects a space-separated package list on one line.
-          packages: "platform-tools platforms;android-36 build-tools;36.0.0 cmake;4.1.2 ndk;30.0.16248370"
-          log-accepted-android-sdk-licenses: false
+			- name: Setup Android SDK
+				uses: android-actions/setup-android@v4
+				with:
+					# This action expects a space-separated package list on one line.
+					packages: "platform-tools platforms;android-36 build-tools;36.0.0 cmake;4.1.2 ndk;30.0.16248370"
+					log-accepted-android-sdk-licenses: false
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: "9.9.2"
+			- name: Set up Gradle
+				uses: gradle/actions/setup-gradle@v6
+				with:
+					gradle-version: "9.9.2"
 
-      - name: Build release APK
-        run: gradle --no-daemon --stacktrace :app:assembleRelease
+			- name: Inspect Kotlin dependencies
+				run: |
+					gradle --no-daemon :app:dependencyInsight \
+						--configuration releaseRuntimeClasspath \
+						--dependency kotlin-stdlib
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v7
-        with:
-          name: maze-game-arm64-release
-          path: app/build/outputs/apk/release/*.apk
-          if-no-files-found: error
-          retention-days: 14
+					gradle --no-daemon :app:dependencies \
+						--configuration releaseRuntimeClasspath \
+						> dependencies.txt
+
+					grep -i -B 3 -A 5 kotlin dependencies.txt || true
+
+			- name: Build release APK
+				run: gradle --no-daemon --stacktrace :app:assembleRelease
+
+			- name: Upload dependency report
+				uses: actions/upload-artifact@v7
+				with:
+					name: dependency-report
+					path: dependencies.txt
+
+			- name: Upload APK
+				uses: actions/upload-artifact@v7
+				with:
+					name: maze-game-arm64-release
+					path: app/build/outputs/apk/release/*.apk
+					if-no-files-found: error
+					retention-days: 14
