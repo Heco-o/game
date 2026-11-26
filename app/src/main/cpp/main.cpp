@@ -33,8 +33,6 @@ std::atomic<uint32_t> FPS{0}, TPS{0};
 std::random_device rd;
 std::mt19937 gen(rd());
 
-sf::RenderWindow window;
-
 struct Input {
 	glm::fvec2 v;
 };
@@ -320,7 +318,7 @@ entt::entity createPlayer(entt::registry& registry, const float posX, const floa
 }
 
 int main() {
-	window.create(sf::VideoMode::getDesktopMode(), "", sf::State::Fullscreen);
+	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "", sf::State::Fullscreen);
 	
 	//window.setVerticalSyncEnabled(false);
 	//window.setFramerateLimit(60);
