@@ -29,6 +29,10 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags += listOf("-std=c++20")
+
+                arguments += listOf(
+                    "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+                )
             }
         }
     }

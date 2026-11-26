@@ -1,3 +1,4 @@
+
 name: Android Release APK
 
 on:
@@ -14,6 +15,10 @@ jobs:
     name: Build arm64-v8a release APK
     runs-on: ubuntu-24.04
 
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_MAXSIZE: 500M
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v7
@@ -27,7 +32,6 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          # This action expects a space-separated package list on one line.
           packages: "platform-tools platforms;android-36 build-tools;36.0.0 cmake;4.1.2 ndk;30.0.16248370"
           log-accepted-android-sdk-licenses: false
 
@@ -36,8 +40,38 @@ jobs:
         with:
           gradle-version: "9.9.2"
 
+      # Install ccache
+      - name: Install ccache
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ccache
+          ccache --version
+
+      # Cache previously compiled C++ files
+      - name: Cache ccache
+        uses: actions/cache@v6
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-ndk30.0.16248370-api28-arm64-v8a-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ccache-${{ runner.os }}-ndk30.0.16248370-api28-arm64-v8a-
+
+      # Cache CMake configuration, FetchContent sources and native build outputs
+      - name: Cache native CMake build
+        uses: actions/cache@v6
+        with:
+          path: app/.cxx
+          key: native-${{ runner.os }}-ndk30.0.16248370-cmake4.1.2-api28-arm64-v8a-release-${{ hashFiles('app/src/main/cpp/CMakeLists.txt', 'app/build.gradle.kts') }}
+
+      # Reset statistics without deleting cached compilation results
+      - name: Reset ccache statistics
+        run: ccache --zero-stats
+
       - name: Build release APK
         run: gradle --no-daemon --stacktrace :app:assembleRelease
+
+      - name: Show ccache statistics
+        run: ccache --show-stats
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
