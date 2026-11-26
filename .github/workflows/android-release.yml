@@ -36,26 +36,8 @@ jobs:
         with:
           gradle-version: "9.9.2"
 
-      - name: Inspect Kotlin dependencies
-        run: |
-          gradle --no-daemon :app:dependencyInsight \
-            --configuration releaseRuntimeClasspath \
-            --dependency kotlin-stdlib
-
-          gradle --no-daemon :app:dependencies \
-            --configuration releaseRuntimeClasspath \
-            > dependencies.txt
-
-          grep -i -B 3 -A 5 kotlin dependencies.txt || true
-
       - name: Build release APK
         run: gradle --no-daemon --stacktrace :app:assembleRelease
-
-      - name: Upload dependency report
-        uses: actions/upload-artifact@v7
-        with:
-          name: dependency-report
-          path: dependencies.txt
 
       - name: Upload APK
         uses: actions/upload-artifact@v7

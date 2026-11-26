@@ -10,6 +10,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.maze"
+        
+        enableKotlin = false
 
         // Android 9 (Pie) is API 28.
         minSdk = 28
