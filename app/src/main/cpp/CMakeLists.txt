@@ -6,8 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Build SFML as static libraries and only include modules currently used.
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+# Build SFML as static libraries and only include modules currently used. Old
+
+# build sfml as shared library
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
 set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
 set(SFML_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
