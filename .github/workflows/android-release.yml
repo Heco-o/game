@@ -73,6 +73,30 @@ jobs:
       - name: Show ccache statistics
         run: ccache --show-stats
 
+      - name: Collect unstripped native libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostic-native-libs
+          mapfile -d '' native_libraries < <(find app -type f -name '*.so' -print0)
+          if [ "${#native_libraries[@]}" -eq 0 ]; then
+            echo "No native shared libraries found under app/."
+            exit 1
+          fi
+          for library in "${native_libraries[@]}"; do
+            mkdir -p "diagnostic-native-libs/$(dirname "$library")"
+            cp "$library" "diagnostic-native-libs/$library"
+            echo "Collected: $library"
+          done
+
+      - name: Upload native diagnostic libraries
+        uses: actions/upload-artifact@v7
+        with:
+          name: maze-game-native-diagnostic-libs
+          path: diagnostic-native-libs/**
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
