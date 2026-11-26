@@ -6,9 +6,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Build SFML as static libraries and only include modules currently used. Old
+# Diagnostic build: retain native debug information and frame pointers even
+# in the Release configuration so Android tombstones can be symbolicated.
+add_compile_options(-g -fno-omit-frame-pointer)
 
-# build sfml as shared library
+# Build the SFML modules used by this application as shared libraries.
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
 set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
