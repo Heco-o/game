@@ -331,7 +331,7 @@ int main() {
 	
 	entt::registry registry;
 	
-	createPlayer(registry, window.getSize().x, window.getSize().y, sf::Color::Blue, 20, 180, 180);
+	createPlayer(registry, window.getSize().x / 2.f - 10, window.getSize().y / 2.f - 10, sf::Color::Blue, 20, 180, 180);
 	
 	std::unordered_map<entt::entity, RenderCommand> renderCommands;
 	std::unordered_map<entt::entity, RenderObject> renderObjects;
